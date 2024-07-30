@@ -20,7 +20,7 @@ from api.repositories import get_repo_info
 from api.scorecard import get_scorecard_data
 from api.workflow import get_workflow
 
-dir_path = "/"
+dir_path = "/Users/zhangyujin/PycharmProjects/oss-percentile"
 
 
 def scrape(owner, repo, token):
@@ -168,7 +168,7 @@ def scrape(owner, repo, token):
 
 
 if __name__ == '__main__':
-    owner = "chalk"
-    repo = "chalk"
+    owner = ""
+    repo = ""
     token = ""
     scrape(owner, repo, token)

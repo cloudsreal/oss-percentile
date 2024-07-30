@@ -6,8 +6,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 import pytz
 
-metrics_path = "//metrics.csv"
-repos_data_path = "//data"
+metrics_path = "/Users/zhangyujin/PycharmProjects/oss-percentile/output/metrics.csv"
+repos_data_path = "/Users/zhangyujin/PycharmProjects/oss-percentile/data"
 
 def initialize():
     metrics = {
@@ -55,12 +55,7 @@ def initialize():
     df.to_csv(metrics_path, index=False)
 
 
-if __name__ == '__main__':
-    initialize()
-
-    owner = "chalk"
-    repo = "chalk"
-
+def calculate(owner, repo):
     metrics = pd.read_csv(metrics_path)
     july_aware = datetime(2023, 7, 1, tzinfo=pytz.utc)
     jan_aware = datetime(2024, 1, 31, tzinfo=pytz.utc)
@@ -104,7 +99,8 @@ if __name__ == '__main__':
                     repo_info = json.load(f)
                 metrics.at[index, 'downstream_dependents'] = f"{repo_info.get('dependents', 0):d}"
                 metrics.at[index, 'number_of_dependencies'] = f"{repo_info.get('dependencies', 0):d}"
-                metrics.at[index, 'dependencies_version_staleness'] = f"{repo_info.get('dependencies_version_staleness', 0):d}"
+                metrics.at[
+                    index, 'dependencies_version_staleness'] = f"{repo_info.get('dependencies_version_staleness', 0):d}"
 
     metrics.to_csv(metrics_path, index=False)
 
@@ -131,7 +127,8 @@ if __name__ == '__main__':
                     contributors.add(commit['commit']['author']['name'])
         metrics.at[index, 'commits_pushed_7m'] = commit_count if commit_count > 0 else "N/A"
         metrics.at[index, 'commits_7m'] = commit_count if commit_count > 0 else "N/A"
-        metrics.at[index, 'comments_per_commit_7m'] = f"{(comment_count / commit_count ):.1f}" if commit_count > 0 else "N/A"
+        metrics.at[
+            index, 'comments_per_commit_7m'] = f"{(comment_count / commit_count):.1f}" if commit_count > 0 else "N/A"
         metrics.at[index, 'distinct_contributors_7m'] = len(contributors) if len(contributors) > 0 else "N/A"
 
     metrics.to_csv(metrics_path, index=False)
@@ -181,9 +178,12 @@ if __name__ == '__main__':
                                 comment_length += len(comment['body'])
                                 comment_count += 1
             metrics.at[index, 'issue_reporters_7m'] = len(participants)
-            metrics.at[index, 'average_time_to_close_issues_7m'] = f"{(total_time_to_close / closed_issues_count / (24 * 3600)):.1f}" if closed_issues_count > 0 else "N/A"
-            metrics.at[index, 'average_time_first_comment_issues_7m'] = f"{(total_time_to_comment / commented_issues_count / (24 * 3600)):.1f}" if commented_issues_count > 0 else "N/A"
-            metrics.at[index, 'average_comment_length_7m'] = f"{(comment_length / comment_count) :.1f}" if comment_count > 0 else "N/A"
+            metrics.at[
+                index, 'average_time_to_close_issues_7m'] = f"{(total_time_to_close / closed_issues_count / (24 * 3600)):.1f}" if closed_issues_count > 0 else "N/A"
+            metrics.at[
+                index, 'average_time_first_comment_issues_7m'] = f"{(total_time_to_comment / commented_issues_count / (24 * 3600)):.1f}" if commented_issues_count > 0 else "N/A"
+            metrics.at[
+                index, 'average_comment_length_7m'] = f"{(comment_length / comment_count) :.1f}" if comment_count > 0 else "N/A"
 
     metrics.to_csv(metrics_path, index=False)
 
@@ -229,8 +229,10 @@ if __name__ == '__main__':
                             commented_pulls_count += 1
             metrics.at[index, 'distinct_people_closed_PRs_7m'] = len(participants)
             metrics.at[index, 'submitted_PRs_7m'] = f"{pulls_count:d}"
-            metrics.at[index, 'time_to_close_PRs_7m'] = f"{(total_time_to_close / closed_pulls_count / (24 * 3600)):.1f}" if closed_pulls_count > 0 else "N/A"
-            metrics.at[index, 'time_first_comment_close_PRs_7m'] = f"{(total_time_to_comment / commented_pulls_count / (24 * 3600)):.1f}" if commented_pulls_count > 0 else "N/A"
+            metrics.at[
+                index, 'time_to_close_PRs_7m'] = f"{(total_time_to_close / closed_pulls_count / (24 * 3600)):.1f}" if closed_pulls_count > 0 else "N/A"
+            metrics.at[
+                index, 'time_first_comment_close_PRs_7m'] = f"{(total_time_to_comment / commented_pulls_count / (24 * 3600)):.1f}" if commented_pulls_count > 0 else "N/A"
 
     metrics.to_csv(metrics_path, index=False)
 
@@ -256,8 +258,8 @@ if __name__ == '__main__':
         if os.path.exists(issues_rate_path):
             with open(issues_rate_path, 'r') as f:
                 issues_rate = json.load(f)
-            open_issues = issues_rate.get('open_issues',0)
-            closed_issues = issues_rate.get('closed_issues',0)
+            open_issues = issues_rate.get('open_issues', 0)
+            closed_issues = issues_rate.get('closed_issues', 0)
             metrics.at[
                 index, 'issues_closed_percentage'] = f"{(closed_issues / (open_issues + closed_issues)):.1f}" if open_issues + closed_issues > 0 else "N/A"
         open_pulls = 0
@@ -269,7 +271,8 @@ if __name__ == '__main__':
             open_pulls = pulls_rate.get('open_pulls', 0)
             closed_pulls = pulls_rate.get('closed_pulls', 0)
             metrics.at[
-                index, 'PRs_closed_percentage'] = f"{(closed_pulls / (open_pulls + closed_pulls)):.1f}" if (open_pulls + closed_pulls) > 0 else "N/A"
+                index, 'PRs_closed_percentage'] = f"{(closed_pulls / (open_pulls + closed_pulls)):.1f}" if (
+                                                                                                                       open_pulls + closed_pulls) > 0 else "N/A"
 
     metrics.to_csv(metrics_path, index=False)
 
@@ -281,7 +284,8 @@ if __name__ == '__main__':
         if os.path.exists(profile_path):
             with open(profile_path, 'r') as f:
                 profile = json.load(f)
-            metrics.at[index, 'community_health_percentage'] = f"{profile.get('health_percentage')}" if profile else "N/A"
+            metrics.at[
+                index, 'community_health_percentage'] = f"{profile.get('health_percentage')}" if profile else "N/A"
 
     metrics.to_csv(metrics_path, index=False)
 
@@ -365,7 +369,7 @@ if __name__ == '__main__':
                     files_with_more_than_1_contributors += 1
             num_files = len(file_contributors)
             metrics.at[
-                index, 'contributors_per_code_file'] = total_contributors / total_files if total_files > 0 else "N/A"
+                index, 'contributors_per_code_file'] = f"{total_contributors / total_files:.1f}" if total_files > 0 else "N/A"
             metrics.at[
                 index, 'files_with_2plus_contributors'] = f"{files_with_more_than_1_contributors}" if files_with_more_than_1_contributors > 0 else "N/A"
 
@@ -466,3 +470,12 @@ if __name__ == '__main__':
                     metrics.at[index, 'dependencies_with_vulnerabilities'] = value if value.isdigit() else "N/A"
 
     metrics.to_csv(metrics_path, index=False)
+
+
+if __name__ == '__main__':
+    initialize()
+
+    owner = "chalk"
+    repo = "chalk"
+
+    calculate(owner, repo)
